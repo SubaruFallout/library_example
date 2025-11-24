@@ -41,18 +41,29 @@ TEST(TestClientClass, Subtest_2) {
     std::string name = "SomeoneName";
     int bookId1 = 10;
     int bookId2 = 13;
-    std::unordered_set<int> rentedBookIdList = {bookId1, bookId2};
 
-    std::unique_ptr<Client> client = std::make_unique<Client>(clientId, name, rentedBookIdList);
+    std::unique_ptr<Client> client = std::make_unique<Client>(clientId, name);
+    client->AddRentedBookId(bookId1);
+    client->AddRentedBookId(bookId2);
 
-    EXPECT_EQ(client->GetId(), clientId);
-    EXPECT_EQ(client->GetName(), name);
+    json j = client->ToJson();
+
+    std::unique_ptr<Client> sameClient = std::make_unique<Client>(j);  
+
+    EXPECT_EQ(client->GetId(), sameClient->GetId());
+    EXPECT_EQ(client->GetName(), sameClient->GetName());
     {
         auto& rentedBookIdList = client->GetRentedBookIdList();
-        EXPECT_EQ(rentedBookIdList.size(), 2);
+        auto& sameRentedBookIdList = sameClient->GetRentedBookIdList();
+        EXPECT_EQ(rentedBookIdList.size(), sameRentedBookIdList.size());
         EXPECT_TRUE(rentedBookIdList.find(bookId1) != rentedBookIdList.end());
         EXPECT_TRUE(rentedBookIdList.find(bookId2) != rentedBookIdList.end());
+
+        EXPECT_TRUE(sameRentedBookIdList.find(bookId1) != sameRentedBookIdList.end());
+        EXPECT_TRUE(sameRentedBookIdList.find(bookId2) != sameRentedBookIdList.end());
     }
+
+    // std::cout << std::setw(4) << j << std::endl;
 }
 
 int main(int argc, char **argv){

@@ -4,6 +4,10 @@
 #include <string>
 #include <unordered_set>
 
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
+
 class Client {
   public:
     Client() = default;
@@ -11,11 +15,7 @@ class Client {
     Client(int id, const std::string& name) :
         id_(id), name_(name) {}
 
-    Client(int id, const std::string& name, const std::unordered_set<int>& rentedBookIdList):
-        // id_(id), name_(name), rentedBookIdList_(rentedBookIdList_) {
-        id_(id), name_(name) {
-          rentedBookIdList_ = rentedBookIdList;
-        }
+    Client(const json& j);
 
     int GetId() const;
 
@@ -26,6 +26,8 @@ class Client {
     void AddRentedBookId (int bookId);
 
     void RemoveRentedBookId (int bookId);
+
+    json ToJson() const;
 
   private:
     int id_;

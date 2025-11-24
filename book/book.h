@@ -4,6 +4,10 @@
 #include <optional>
 #include <string>
 
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
+
 class Book {
   public:
     Book() = default;
@@ -11,8 +15,7 @@ class Book {
     Book(int id, const std::string& name, const std::string& authorName) :
         id_(id), name_(name), authorName_(authorName) {}
     
-    Book(int id, const std::string& name, const std::string& authorName, std::optional<int> clientId) :
-        id_(id), name_(name), authorName_(authorName), clientId_(clientId) {}
+    Book(const json& j);
 
     int GetId() const;
 
@@ -25,6 +28,8 @@ class Book {
     int GetClientId() const;
 
     void UpdateOwnership(std::optional<int> clientId);
+
+    json ToJson() const;
 
   private:
     int id_;

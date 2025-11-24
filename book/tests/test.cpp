@@ -33,13 +33,18 @@ TEST(TestBookClass, Subtest_2) {
     std::string authorName = "SomeoneName";
     int clientId = 123;
 
-    std::unique_ptr<Book> book = std::make_unique<Book>(bookId, name, authorName, std::make_optional<int>(123));
+    std::unique_ptr<Book> book = std::make_unique<Book>(bookId, name, authorName);
+    book->UpdateOwnership(clientId);
 
-    EXPECT_EQ(book->GetId(), bookId);
-    EXPECT_EQ(book->GetName(), name);
-    EXPECT_EQ(book->GetAuthorName(), authorName);
-    EXPECT_EQ(book->IsAtClient(), true);
-    EXPECT_EQ(book->GetClientId(), clientId);
+    json j = book->ToJson();
+
+    std::unique_ptr<Book> sameBook = std::make_unique<Book>(j); 
+
+    EXPECT_EQ(book->GetId(), sameBook->GetId());
+    EXPECT_EQ(book->GetName(), sameBook->GetName());
+    EXPECT_EQ(book->GetAuthorName(), sameBook->GetAuthorName());
+    EXPECT_EQ(book->IsAtClient(), sameBook->IsAtClient());
+    EXPECT_EQ(book->GetClientId(), sameBook->GetClientId());
 }
 
 int main(int argc, char **argv){

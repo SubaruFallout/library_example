@@ -19,3 +19,17 @@ void Client::AddRentedBookId (int bookId) {
 void Client::RemoveRentedBookId (int bookId) {
     rentedBookIdList_.erase(bookId);
 }
+
+Client::Client (const json& j) {
+    id_ = j["id"].get<int>();
+    name_ = j["name"].get<std::string>();
+    rentedBookIdList_ = j["rentedBookIdList"].get<std::unordered_set<int>>();
+}
+
+json Client::ToJson() const {
+    json j;
+    j["id"] = id_;
+    j["name"] = name_;
+    j["rentedBookIdList"] = rentedBookIdList_;
+    return j;
+}
