@@ -1,3 +1,6 @@
+#ifndef LIBRARY_H_
+#define LIBRARY_H_
+
 #include <memory>
 #include <unordered_map>
 
@@ -11,19 +14,25 @@ class Library {
     void AddNewBook(const std::string& bookName, const std::string& authorName);
     void AddNewClient(const std::string& clientName);
 
-    std::shared_ptr<Book> GetBookById(int bookId);
-    std::shared_ptr<Book> GetBookByName(const std::string& bookName);
+    const Book& GetBookById(int bookId);
+    const Book& GetBookByName(const std::string& bookName);
 
-    std::shared_ptr<Client> GetClientById(int clientId);
+    const Client& GetClientById(int clientId);
 
     void RentBookToClient(int clientId, int bookId);
 
     void ReturnBookFromClient(int clientId, int bookId);
 
+    const std::unordered_map<int, Book>& GetBookList();
+    
+    const std::unordered_map<int, Client>& GetClientList();
+
   private:
-    std::shared_ptr<std::unordered_map<int, std::shared_ptr<Book>>> bookList_;
-    std::shared_ptr<std::unordered_map<int, std::shared_ptr<Client>>> clientList_;
+    std::unordered_map<int, Book> bookList_;
+    std::unordered_map<int, Client> clientList_;
 
     int lastBookId_;
     int lastClientId_;
 };
+
+#endif  // LIBRARY_H_

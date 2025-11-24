@@ -2,24 +2,24 @@
 
 #include "client.h"
 
-TEST(TestBookClass, Subtest_1) {
+TEST(TestClientClass, Subtest_1) {
     int clientId = 123;
     std::string name = "SomeoneName";
 
-    Client client(clientId, name);
+    std::unique_ptr<Client> client = std::make_unique<Client>(clientId, name);
 
-    EXPECT_EQ(client.GetId(), clientId);
-    EXPECT_EQ(client.GetName(), name);
-    EXPECT_EQ(client.GetRentedBookIdList().empty(), true);
+    EXPECT_EQ(client->GetId(), clientId);
+    EXPECT_EQ(client->GetName(), name);
+    EXPECT_EQ(client->GetRentedBookIdList().empty(), true);
 
     //
 
     int bookId1 = 10;
     int bookId2 = 13;
-    client.AddRentedBookId(bookId1);
-    client.AddRentedBookId(bookId2);
+    client->AddRentedBookId(bookId1);
+    client->AddRentedBookId(bookId2);
     {
-        auto rentedBookIdList = client.GetRentedBookIdList();
+        auto& rentedBookIdList = client->GetRentedBookIdList();
         EXPECT_EQ(rentedBookIdList.size(), 2);
         EXPECT_TRUE(rentedBookIdList.find(bookId1) != rentedBookIdList.end());
         EXPECT_TRUE(rentedBookIdList.find(bookId2) != rentedBookIdList.end());
@@ -27,28 +27,28 @@ TEST(TestBookClass, Subtest_1) {
     
     //
 
-    client.RemoveRentedBookId(bookId1);
+    client->RemoveRentedBookId(bookId1);
     {
-        auto rentedBookIdList = client.GetRentedBookIdList();
+        auto& rentedBookIdList = client->GetRentedBookIdList();
         EXPECT_EQ(rentedBookIdList.size(), 1);
         EXPECT_TRUE(rentedBookIdList.find(bookId1) == rentedBookIdList.end());
         EXPECT_TRUE(rentedBookIdList.find(bookId2) != rentedBookIdList.end());
     }
 }
 
-TEST(TestGroupName, Subtest_2) {
+TEST(TestClientClass, Subtest_2) {
     int clientId = 123;
     std::string name = "SomeoneName";
     int bookId1 = 10;
     int bookId2 = 13;
     std::unordered_set<int> rentedBookIdList = {bookId1, bookId2};
 
-    Client client(clientId, name, rentedBookIdList);
+    std::unique_ptr<Client> client = std::make_unique<Client>(clientId, name, rentedBookIdList);
 
-    EXPECT_EQ(client.GetId(), clientId);
-    EXPECT_EQ(client.GetName(), name);
+    EXPECT_EQ(client->GetId(), clientId);
+    EXPECT_EQ(client->GetName(), name);
     {
-        auto rentedBookIdList = client.GetRentedBookIdList();
+        auto& rentedBookIdList = client->GetRentedBookIdList();
         EXPECT_EQ(rentedBookIdList.size(), 2);
         EXPECT_TRUE(rentedBookIdList.find(bookId1) != rentedBookIdList.end());
         EXPECT_TRUE(rentedBookIdList.find(bookId2) != rentedBookIdList.end());

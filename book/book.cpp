@@ -1,22 +1,22 @@
 #include "book.h"
 
-int Book::GetId() {
+int Book::GetId() const {
     return id_;
 }
 
-const std::string& Book::GetName() {
+const std::string& Book::GetName() const {
     return name_;
 }
 
-const std::string& Book::GetAuthorName() {
+const std::string& Book::GetAuthorName() const {
     return authorName_;
 }
 
-bool Book::IsAtClient() {
+bool Book::IsAtClient() const {
     return clientId_.has_value();
 }
 
-int Book::GetClientId() {
+int Book::GetClientId() const {
     return *clientId_;
 }
 

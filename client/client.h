@@ -1,8 +1,13 @@
+#ifndef CLIENT_H_
+#define CLIENT_H_
+
 #include <string>
 #include <unordered_set>
 
 class Client {
   public:
+    Client() = default;
+
     Client(int id, const std::string& name) :
         id_(id), name_(name) {}
 
@@ -12,11 +17,11 @@ class Client {
           rentedBookIdList_ = rentedBookIdList;
         }
 
-    int GetId();
+    int GetId() const;
 
-    const std::string& GetName();
+    const std::string& GetName() const;
 
-    const std::unordered_set<int>& GetRentedBookIdList();
+    const std::unordered_set<int>& GetRentedBookIdList() const;
 
     void AddRentedBookId (int bookId);
 
@@ -27,3 +32,5 @@ class Client {
     std::string name_;
     std::unordered_set<int> rentedBookIdList_;
 };
+
+#endif  // CLIENT_H_
