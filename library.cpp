@@ -47,3 +47,32 @@ const std::unordered_map<int, Book>& Library::GetBookList() {
 const std::unordered_map<int, Client>& Library::GetClientList() {
     return clientList_;
 }
+
+Library::Library(const json& j) {
+    lastBookId_ = j["lastBookId"].get<int>();
+    lastClientId_ = j["lastClientId"].get<int>();
+    for (auto& j_book : j["bookList"]) {
+        Book book(j_book);
+        bookList_[book.GetId()] = std::move(book);
+    }
+
+    for (auto& j_client : j["clientList"]) {
+        Client client(j_client);
+        clientList_[client.GetId()] = std::move(client);
+    }
+}
+
+json Library::ToJson() {
+    json j;
+    j["lastBookId"] = lastBookId_;
+    j["lastClientId"] = lastClientId_;
+    for (auto& [bookId, book] : bookList_) {
+        j["bookList"].push_back(book.ToJson());
+    }
+
+    for (auto& [clientId, client] : clientList_) {
+        j["clientList"].push_back(client.ToJson());
+    }
+
+    return j;
+}

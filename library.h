@@ -7,9 +7,14 @@
 #include "client/client.h"
 #include "book/book.h"
 
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
+
 class Library {
   public:
     Library() = default;
+    Library(const json& j);
 
     void AddNewBook(const std::string& bookName, const std::string& authorName);
     void AddNewClient(const std::string& clientName);
@@ -26,6 +31,8 @@ class Library {
     const std::unordered_map<int, Book>& GetBookList();
     
     const std::unordered_map<int, Client>& GetClientList();
+
+    json ToJson();
 
   private:
     std::unordered_map<int, Book> bookList_;

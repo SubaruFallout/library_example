@@ -158,6 +158,44 @@ TEST(TestLibraryClass, Subtest_2) {
     }
 }
 
+TEST(TestLibraryClass, Subtest_3) {
+    std::unique_ptr<Library> library = std::make_unique<Library>();
+
+    std::string bookName1 = "Yellow";
+    std::string bookName2 = "Red";
+    std::string bookName3 = "Blue";
+    std::string authorName = "SomeoneName";
+
+    library->AddNewBook(bookName1, authorName);
+    library->AddNewBook(bookName2, authorName);
+    library->AddNewBook(bookName3, authorName);
+
+    std::string clientName1 = "John";
+    std::string clientName2 = "Dave";
+
+    library->AddNewClient(clientName1);
+    library->AddNewClient(clientName2);
+
+
+    library->RentBookToClient(0, 2); // John <- Blue
+    library->RentBookToClient(1, 1); // Dave <- Red
+    library->RentBookToClient(1, 0); // Dave <- Yellow
+
+    json j = library->ToJson();
+
+    std::unique_ptr<Library> sameLibrary = std::make_unique<Library>(j);
+
+    {
+        auto& bookList = library->GetBookList();
+        auto& sameBookList = sameLibrary->GetBookList();
+        EXPECT_EQ(bookList.size(), sameBookList.size());
+        // TO DO
+    }
+
+    json j2 = sameLibrary->ToJson();
+    std::cout << std::setw(4) << j2 << std::endl;
+}
+
 int main(int argc, char **argv){
   ::testing::InitGoogleTest(&argc, argv);
 
