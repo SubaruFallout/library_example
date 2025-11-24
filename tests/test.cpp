@@ -187,9 +187,42 @@ TEST(TestLibraryClass, Subtest_3) {
 
     {
         auto& bookList = library->GetBookList();
-        auto& sameBookList = sameLibrary->GetBookList();
-        EXPECT_EQ(bookList.size(), sameBookList.size());
-        // TO DO
+        {   
+            auto& sameBookList = sameLibrary->GetBookList();
+            EXPECT_EQ(bookList.size(), sameBookList.size());
+        }
+        
+        for (auto& [bookId, book] : bookList) {
+            auto& sameBook = sameLibrary->GetBookById(bookId);
+            EXPECT_EQ(book.GetId(), sameBook.GetId());
+            EXPECT_EQ(book.GetName(), sameBook.GetName());
+            EXPECT_EQ(book.GetAuthorName(), sameBook.GetAuthorName());
+            EXPECT_EQ(book.IsAtClient(), sameBook.IsAtClient());
+            EXPECT_EQ(book.GetClientId(), sameBook.GetClientId());
+        }
+    }
+
+    {
+        auto& clientList = library->GetClientList();
+        {   
+            auto& sameClientList = sameLibrary->GetClientList();
+            EXPECT_EQ(clientList.size(), sameClientList.size());
+        }
+
+        for (auto& [clientId, client] : clientList) {
+            auto& sameClient = sameLibrary->GetClientById(clientId);
+            EXPECT_EQ(client.GetId(), sameClient.GetId());
+            EXPECT_EQ(client.GetName(), sameClient.GetName());
+            {
+                auto& rentedBookIdList = client.GetRentedBookIdList();
+                auto& sameRentedBookIdList = sameClient.GetRentedBookIdList();
+                EXPECT_EQ(rentedBookIdList.size(), sameRentedBookIdList.size());
+
+                for (auto& rentedBookId: rentedBookIdList) {
+                    EXPECT_TRUE(sameRentedBookIdList.find(rentedBookId) != sameRentedBookIdList.end());
+                }
+            }
+        }
     }
 
     json j2 = sameLibrary->ToJson();
