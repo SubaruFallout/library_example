@@ -16,9 +16,9 @@ class Library {
     Library() = default;
 
     std::shared_ptr<const Book> AddNewBook(const std::string& bookName, const std::string& authorName);
-    void RemoveBook(const Book& book);
+    bool RemoveBook(const Book& book);
     std::shared_ptr<const Client> AddNewClient(const std::string& clientName);
-    void RemoveClient(const Client& client);
+    bool RemoveClient(const Client& client);
 
     std::vector<std::shared_ptr<const Book>> FindBookByName(const std::string& bookName) const;
     std::shared_ptr<const Client> GetClientById(int clientId) const;

@@ -26,16 +26,17 @@ std::shared_ptr<const Book> Library::AddNewBook(const std::string &bookName, con
   return newBook;
 }
 
-void Library::RemoveBook(const Book& book) {
+bool Library::RemoveBook(const Book& book) {
   if (bookList_.find(book.GetId()) == bookList_.end()) {
-    return;
+    return METHOD_FAILED;
   }
   if (rentedBookIdList_.find(book.GetId()) != rentedBookIdList_.end()) {
-    return;
+    return METHOD_FAILED;
   }
 
   bookList_.erase(book.GetId());
   releasedBookIds_.push(book.GetId());
+  return METHOD_SUCCESS;
 }
 
 std::shared_ptr<const Client> Library::AddNewClient(const std::string &clientName) {
@@ -53,16 +54,17 @@ std::shared_ptr<const Client> Library::AddNewClient(const std::string &clientNam
   return newClient;
 }
 
-void Library::RemoveClient(const Client& client) {
+bool Library::RemoveClient(const Client& client) {
   if (clientList_.find(client.GetId()) == clientList_.end()) {
-    return;
+    return METHOD_FAILED;
   }
   if (!client.GetRentedBookList().empty()) {
-    return;
+    return METHOD_FAILED;
   }
 
   clientList_.erase(client.GetId());
   releasedClientIds_.push(client.GetId());
+  return METHOD_SUCCESS;
 }
 
 std::vector<std::shared_ptr<const Book>> Library::FindBookByName(const std::string &bookName) const {
