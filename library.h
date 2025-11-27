@@ -1,45 +1,46 @@
-#ifndef LIBRARY_H_
-#define LIBRARY_H_
+#pragma once
 
 #include <memory>
+#include <stack>
 #include <unordered_map>
-
-#include "client/client.h"
-#include "book/book.h"
 
 #include "nlohmann/json.hpp"
 
-using json = nlohmann::json;
+#include "book/book.h"
+#include "client/client.h"
 
 class Library {
   public:
+    friend class LibrarySerializer;
+
     Library() = default;
-    Library(const json& j);
 
-    void AddNewBook(const std::string& bookName, const std::string& authorName);
-    void AddNewClient(const std::string& clientName);
+    std::shared_ptr<const Book> AddNewBook(const std::string& bookName, const std::string& authorName);
+    std::shared_ptr<const Client> AddNewClient(const std::string& clientName);
 
-    const Book& GetBookById(int bookId);
-    const Book& GetBookByName(const std::string& bookName);
+    std::vector<std::shared_ptr<const Book>> FindBookByName(const std::string& bookName) const;
+    std::shared_ptr<const Client> GetClientById(int clientId) const;
 
-    const Client& GetClientById(int clientId);
-
-    void RentBookToClient(int clientId, int bookId);
-
-    void ReturnBookFromClient(int clientId, int bookId);
-
-    const std::unordered_map<int, Book>& GetBookList();
-    
-    const std::unordered_map<int, Client>& GetClientList();
-
-    json ToJson();
+    bool RentBookToClient(const Client& client, std::shared_ptr<const Book> book);
+    bool ReturnBookFromClient(const Client& client, std::shared_ptr<const Book> book);
 
   private:
-    std::unordered_map<int, Book> bookList_;
-    std::unordered_map<int, Client> clientList_;
+    std::unordered_map<int, std::shared_ptr<Book>> bookList_;
+    std::unordered_set<int> rentedBookIdList_;
+    std::unordered_map<int, std::shared_ptr<Client>> clientList_;
 
-    int lastBookId_;
-    int lastClientId_;
+    int largestBookId_ = 0;
+    int largestClientId_ = 0;
+    mutable std::stack<int> releasedBookIds_;
+    mutable std::stack<int> releasedClientIds_;
 };
 
-#endif  // LIBRARY_H_
+class LibrarySerializer {
+  public:
+    LibrarySerializer() = delete;
+    
+    static nlohmann::json ToJson(const Library& library);
+    
+    static Library FromJson(const nlohmann::json& j);
+
+};

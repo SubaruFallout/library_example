@@ -1,21 +1,18 @@
-#ifndef BOOK_H_
-#define BOOK_H_
+#pragma once
 
 #include <optional>
 #include <string>
 
 #include "nlohmann/json.hpp"
 
-using json = nlohmann::json;
-
 class Book {
   public:
+    friend class BookSerializer;
+
     Book() = default;
 
     Book(int id, const std::string& name, const std::string& authorName) :
         id_(id), name_(name), authorName_(authorName) {}
-    
-    Book(const json& j);
 
     int GetId() const;
 
@@ -23,19 +20,18 @@ class Book {
 
     const std::string& GetAuthorName() const;
 
-    bool IsAtClient() const;
-
-    int GetClientId() const;
-
-    void UpdateOwnership(std::optional<int> clientId);
-
-    json ToJson() const;
-
   private:
     int id_;
     std::string authorName_;
     std::string name_;
-    std::optional<int> clientId_;
 };
 
-#endif  // BOOK_H_
+class BookSerializer {
+  public:
+    BookSerializer() = delete;
+    
+    static nlohmann::json ToJson(const Book& book);
+    
+    static Book FromJson(const nlohmann::json& j);
+
+};

@@ -1,35 +1,58 @@
 #include "client.h"
 
+#define CLIENT_ID_JSON_FIELD_NAME "id"
+#define CLIENT_NAME_JSON_FIELD_NAME "name"
+#define CLIENT_RENTED_BOOK_ID_LIST "rentedBookIdList"
+
 int Client::GetId() const {
-    return id_;
+  return id_;
 }
 
 const std::string& Client::GetName() const {
-    return name_;
+  return name_;
 }
 
-const std::unordered_set<int>& Client::GetRentedBookIdList() const {
-    return rentedBookIdList_;
+std::vector<std::shared_ptr<const Book>> Client::GetRentedBookList() const {
+  std::vector<std::shared_ptr<const Book>> bookList;
+  for (const auto& [bookId, book]: rentedBookList_) {
+    bookList.push_back(book);
+  }
+  return bookList;
 }
 
-void Client::AddRentedBookId (int bookId) {
-    rentedBookIdList_.insert(bookId);
+bool Client::IsRentingThisBook(const Book& book) const {
+  return rentedBookList_.find(book.GetId()) != rentedBookList_.end();
 }
 
-void Client::RemoveRentedBookId (int bookId) {
-    rentedBookIdList_.erase(bookId);
+void Client::AddRentedBook(std::shared_ptr<const Book> book) {
+  rentedBookList_[book->GetId()] = book;
 }
 
-Client::Client (const json& j) {
-    id_ = j["id"].get<int>();
-    name_ = j["name"].get<std::string>();
-    rentedBookIdList_ = j["rentedBookIdList"].get<std::unordered_set<int>>();
+void Client::RemoveRentedBook(const Book& book) {
+  rentedBookList_.erase(book.GetId());
 }
 
-json Client::ToJson() const {
-    json j;
-    j["id"] = id_;
-    j["name"] = name_;
-    j["rentedBookIdList"] = rentedBookIdList_;
-    return j;
+
+nlohmann::json ClientSerializer::ToJson(const Client& client) {
+  nlohmann::json j;
+  j[CLIENT_ID_JSON_FIELD_NAME] = client.id_;
+  j[CLIENT_NAME_JSON_FIELD_NAME] = client.name_;
+  for (const auto& [bookId, book] : client.rentedBookList_) {
+    j[CLIENT_RENTED_BOOK_ID_LIST].push_back(bookId);
+  }
+  return j;
+}
+
+Client ClientSerializer::FromJson(const nlohmann::json& j, 
+                                  const std::unordered_map<int, std::shared_ptr<Book>>& bookList) {
+  Client client;
+  client.id_ = j[CLIENT_ID_JSON_FIELD_NAME].get<int>();
+  client.name_ = j[CLIENT_NAME_JSON_FIELD_NAME].get<std::string>();
+  if (j.contains(CLIENT_RENTED_BOOK_ID_LIST)) {
+    for (const auto& rentedBookId: j[CLIENT_RENTED_BOOK_ID_LIST]) {
+      client.rentedBookList_[rentedBookId] = bookList.at(rentedBookId);
+    }
+  }
+
+  return client;
 }

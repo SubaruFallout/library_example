@@ -1,38 +1,45 @@
-#ifndef CLIENT_H_
-#define CLIENT_H_
+#pragma once
 
 #include <string>
 #include <unordered_set>
 
 #include "nlohmann/json.hpp"
 
-using json = nlohmann::json;
+#include "../book/book.h" // Change to normal path
 
 class Client {
   public:
+    friend class ClientSerializer;
+
     Client() = default;
 
     Client(int id, const std::string& name) :
         id_(id), name_(name) {}
 
-    Client(const json& j);
-
     int GetId() const;
 
     const std::string& GetName() const;
 
-    const std::unordered_set<int>& GetRentedBookIdList() const;
+    std::vector<std::shared_ptr<const Book>> GetRentedBookList() const;
 
-    void AddRentedBookId (int bookId);
+    bool IsRentingThisBook(const Book& book) const;
 
-    void RemoveRentedBookId (int bookId);
+    void AddRentedBook(std::shared_ptr<const Book> book);
 
-    json ToJson() const;
+    void RemoveRentedBook(const Book& book);
 
   private:
     int id_;
     std::string name_;
-    std::unordered_set<int> rentedBookIdList_;
+    std::unordered_map<int, std::shared_ptr<const Book>> rentedBookList_;
 };
 
-#endif  // CLIENT_H_
+class ClientSerializer {
+  public:
+    ClientSerializer() = delete;
+    
+    static nlohmann::json ToJson(const Client& client);
+    
+    static Client FromJson(const nlohmann::json& j, 
+                           const std::unordered_map<int, std::shared_ptr<Book>>& bookList);
+};
